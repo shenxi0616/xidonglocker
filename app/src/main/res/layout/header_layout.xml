@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--侧滑栏头部-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:background="@drawable/uesrbackgroud">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/user_image"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/header"
+        app:riv_border_color="#333333"
+        app:riv_border_width="2dp"
+        app:riv_mutate_background="true"
+        app:riv_oval="true"
+        android:layout_centerInParent="true"
+        />
+    <TextView
+        android:id="@+id/head_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="西门吹雪"
+        android:layout_below="@+id/user_image"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="12dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="11dp"
+        />
+</RelativeLayout>

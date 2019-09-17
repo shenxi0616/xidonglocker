@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mywallet"
+        android:icon="@drawable/mywallet"
+        android:title="我的钱包"
+        />
+    <item
+        android:id="@+id/orderform"
+        android:icon="@drawable/order_icon"
+        android:title="我的订单"/>
+    <item
+        android:id="@+id/mycard"
+        android:icon="@drawable/mycard"
+        android:title="我的卡卷"/>
+    <item
+        android:id="@+id/VIP"
+        android:icon="@drawable/vip"
+        android:title="会员中心"/>
+    <item
+        android:id="@+id/about_us"
+        android:icon="@drawable/about"
+        android:title="关于我们"/>
+    <item
+        android:id="@+id/suggestion"
+        android:icon="@drawable/suggest"
+        android:title="意见反馈"/>
+</menu>

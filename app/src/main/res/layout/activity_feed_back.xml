@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FeedBackActivity">
+    <Layout.TitleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/text_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="问题描述*"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="7dp"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignLeft="@+id/feed_back_edit"
+        />
+    
+    <EditText
+        android:id="@+id/feed_back_edit"
+        android:layout_width="330dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/text_question"
+        android:focusable="false"
+        android:onClick="feedBackToast"
+        />
+    <TextView
+        android:id="@+id/upload_text"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:text="上传图片(最多四张)"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="7dp"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/feed_back_edit"
+        android:layout_alignLeft="@+id/feed_back_edit"
+        />
+
+    <Button
+        android:id="@+id/btn_upload"
+        android:layout_width="67dp"
+        android:layout_height="67dp"
+        android:background="@drawable/camera"
+        android:layout_below="@+id/upload_text"
+        android:layout_alignLeft="@+id/feed_back_edit"/>
+
+    <Button
+        android:layout_width="333dp"
+        android:layout_height="47dp"
+        android:text="马上提交"
+        android:textColor="@color/white"
+        android:textSize="21sp"
+        android:textStyle="bold"
+        android:background="@drawable/shape"
+        android:layout_below="@+id/btn_upload"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        />
+</RelativeLayout>

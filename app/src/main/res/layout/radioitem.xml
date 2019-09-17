@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp">
+    <RadioGroup
+        android:id="@+id/radioGroup_gender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+
+        <RadioButton
+            android:drawableLeft="@drawable/zhifubao"
+            android:id="@+id/rbtn_zhifubao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:drawablePadding="20dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:button="@null"
+            android:checked="true"
+            android:text="支付宝" />
+        <RadioButton
+            android:drawableLeft="@drawable/weixin"
+            android:id="@+id/rbtn_wexin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:drawablePadding="20dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:button="@null"
+            android:text="微信" />
+        <RadioButton
+            android:id="@+id/rbtn_quotas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:drawablePadding="20dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:button="@null"
+            android:text="余额支付" />
+    </RadioGroup>
+</LinearLayout>

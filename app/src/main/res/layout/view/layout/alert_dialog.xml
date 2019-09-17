@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:padding="10dp"
+    >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择储物柜使用时间"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_gravity="center_horizontal"/>
+
+        <view.MyWheelView
+            android:id="@+id/wheel_view"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            app:item_number="5"
+            app:selected_background_color="#EEEEEE"
+            app:selected_line_color="#EEEEEE"
+            app:selected_text_color="#CC007FCC"
+            />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_agree_high_opion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="确认"
+            android:background="@drawable/shape"
+            android:textColor="@color/black"
+            android:layout_weight="1"/>
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            />
+        <Button
+            android:id="@+id/btn_cancel_high_opion"
+            android:layout_width="0dp"
+            android:text="取消"
+            android:textColor="@color/black"
+            android:background="@drawable/shape"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</LinearLayout>

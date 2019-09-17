@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--缴纳押金界面-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MyWallet.depositActivity"
+    android:orientation="vertical">
+    <Layout.TitleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/lin_img"
+        android:layout_width="333dp"
+        android:layout_height="130dp"
+        android:background="@drawable/my_wallet_background"
+        android:layout_below="@+id/toolbar"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/str_deposit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="19sp"
+                android:text="押金"
+                android:layout_above="@+id/yuan"
+                android:layout_alignLeft="@+id/yuan"
+                android:textColor="@android:color/black"/>
+            <ImageView
+                android:id="@+id/yuan"
+                android:layout_width="24dp"
+                android:layout_height="40dp"
+                android:src="@drawable/yuan"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="40dp"
+                />
+            <TextView
+                android:id="@+id/money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/yuan"
+                android:layout_alignBottom="@+id/yuan"
+                android:textSize="32sp"
+                android:text="99"
+                android:textColor="@android:color/black"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择支付方式"
+        android:textSize="17sp"
+        android:layout_marginLeft="10dp"/>
+
+    <include layout="@layout/radioitem"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:background="@android:color/white"
+        />
+    <include layout="@layout/item"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button
+            android:id="@+id/btn_pay"
+            android:layout_width="298dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="确认支付"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/shape"/>
+    </RelativeLayout>
+</LinearLayout>
