@@ -104,7 +104,6 @@ public class CreateOrderActivity extends AppCompatActivity {
         Intent intent = getIntent();
         now_storage_code =intent.getStringExtra("now_storage_code");
         pre_end_time = intent.getStringExtra("pre_end_time");
-        Log.e(TAG,"intent.getStringExtra(\"now_storage_code\")--》"+intent.getStringExtra("now_storage_code")+"intent.getStringExtra(\"pre_end_time\")-->"+intent.getStringExtra("pre_end_time"));
 
         new Thread(postRun).start();
     }

@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private String phonenum;
     private ClearEditText editText;
     Button btn_next;
-    String TAG = MainActivity.class.getCanonicalName();
+    String TAG =LoginActivity.class.getCanonicalName();
     private HashMap<String, String> stringHashMap;
 
     // 声明SharedPreferences对象
@@ -54,9 +54,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         StatusBarUtil.setTransparent(LoginActivity.this);//设置沉浸式状态栏
         StatusBarUtil.setLightMode(LoginActivity.this);//设置状态栏字体颜色
-        editText = findViewById(R.id.login_phone);
-        btn_next = findViewById(R.id.btn_next);
+        editText = findViewById(R.id.login_phone);//绑定输入框的控件
+        btn_next = findViewById(R.id.btn_next);//绑定按钮的控件
         stringHashMap = new HashMap<>();
+
+
         setOnFocusChangeErrMsg(editText.getmEdittext(), "phone", "手机号格式不正确");
 
     }
@@ -72,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                         String inputStr = editText.getText().toString();
                         if (!hasFocus) {
                             if (inputType == "phone") {
-                                if (isTelphoneValid(inputStr)) {
+                                if (isTelphoneValid(inputStr)) {//用正则表达式判断是否是手机号码
                                     editText.setError(null);
                                 } else {
                                     editText.setError(errMsg);
@@ -96,11 +98,15 @@ public class LoginActivity extends AppCompatActivity {
         return m.matches();
     }
 
+    //登陆按钮的点击事件
     public void loginPOST(View view) {
         stringHashMap.put("account", editText.getmEdittext().getText().toString());
     // 让密码输入框失去焦点,触发setOnFocusChangeErrMsg方法
         editText.clearFocus();
         String account = editText.getmEdittext().getText().toString();
+//        Intent intent = new Intent(LoginActivity.this, CheckingActivity.class);
+//        intent.putExtra("tel", phonenum);
+//        startActivity(intent);
     // 发送URL请求之前,先进行校验
         if (isTelphoneValid(account)) {
             new Thread(postRun).start();
@@ -123,12 +129,12 @@ public class LoginActivity extends AppCompatActivity {
      *
      * @param paramsMap
      */
+
+
+    //发送请求到服务器，处理服务器的返回的信息
     private void requestPost(HashMap<String, String> paramsMap) {
         try {
-            String baseUrl3 = "http://172.20.10.9:8080/locker/creatInfoCode/";
-            String baseUrl = "http://192.168.43.6:8080/locker/creatInfoCode/";
-            String baseUrl2 = "http://10.4.123.236:8080/locker/creatInfoCode/";
-            baseUrl = new HttpRequest().baseUrlLogin;
+            String baseUrl = new HttpRequest().baseUrlLogin;
             //合成参数
             StringBuilder tempParams = new StringBuilder();
             int pos = 0;
@@ -149,6 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     showToastInThread(LoginActivity.this,"连接失败");
+                    Log.e(TAG,"错误-->>"+e);
                 }
 
                 @Override
@@ -160,6 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                         showToastInThread(LoginActivity.this,"用户被禁用");
                     }else {
                         Intent intent = new Intent(LoginActivity.this, CheckingActivity.class);
+                        //把手机号码保存，用intent保存，再下一个界面取用
                         intent.putExtra("tel", phonenum);
                         startActivity(intent);
                         // 登录成功后，登录界面就没必要占据资源了
@@ -190,6 +198,8 @@ public class LoginActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(jsondata);
             code = jsonObject.getString("msg");
             Log.e(TAG,"code-->>"+code);
+            showToastInThread(LoginActivity.this, code);
+
 
         } catch (Exception e) {
             e.printStackTrace();

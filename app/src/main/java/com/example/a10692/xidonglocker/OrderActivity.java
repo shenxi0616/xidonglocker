@@ -149,6 +149,7 @@ public class OrderActivity extends AppCompatActivity implements SwipeRefreshLayo
         try {
             Gson gson = new Gson();
             order =gson.fromJson(responseResult,Order.class);
+            Log.e(TAG,"order  size-->>"+order.getData().size());
             for (int i=0;i<order.getData().size();i++){
                 Log.e(TAG,"order_status-->>"+order.getData().get(i).getOrder_status());
                 Log.e(TAG,"create_time-->>"+order.getData().get(i).getCreate_time());

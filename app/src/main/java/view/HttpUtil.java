@@ -166,4 +166,16 @@ public class HttpUtil {
                 .build();
         okHttpClient.newCall(request).enqueue(callback);
     }
+    public static void sendOkHttpRequestNear(String address,Double latitude,Double longitude,String token,okhttp3.Callback callback){
+        OkHttpClient okHttpClient = new OkHttpClient();
+        FormBody.Builder formBody = new FormBody.Builder();
+        formBody.add("token",token);
+        formBody.add("latitude",latitude+"");
+        formBody.add("longitude",longitude+"");
+        Request request = new Request.Builder()
+                .url(address)
+                .post(formBody.build())
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
 }

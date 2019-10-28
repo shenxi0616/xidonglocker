@@ -83,6 +83,7 @@ import java.util.List;
 import com.example.a10692.xidonglocker.util.Constant;
 
 import model.ItemOrder;
+import model.NearlyStorage;
 import model.Storage;
 import model.User;
 import okhttp3.Call;
@@ -96,15 +97,18 @@ import view.WalkingRouteOverlay;
 
 public class MainActivity extends AppCompatActivity {
     public LocationClient mLocationClient;
+    public LocationClientOption locationOption;
     private MapView mapView;
     private BaiduMap baiduMap;
-    private Button btn_daohang,btn_test;
+    private Button btn_daohang,btn_test,btn_location;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private LinearLayout linearLayout;
     private NavigationView navigationView;
     private boolean isFirstLocate = true;
     private double latitude,longitude;
+    private double latitudes[],longitudes[];
+
     private LatLng latLng;//获取被点击的Marker的坐标
     private String scanResult;//扫描后返回的储物柜编号
     private SharedPreferences sp ;
@@ -116,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private int usetime = 0;//设置时间轴时间
     private WalkingRouteOverlay overlay;//路线规划
     private String TAG = MainActivity.class.getCanonicalName();
+
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,9 +131,11 @@ public class MainActivity extends AppCompatActivity {
 
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
+        SDKInitializer.initialize(getApplicationContext());
 
 
         btn_daohang = findViewById(R.id.btn_daohang);
+        btn_location = findViewById(R.id.btn_right);
         drawerLayout = findViewById(R.id.drawerlayout);
         navView = findViewById(R.id.navigation_view);
         linearLayout = findViewById(R.id.linlayout);
@@ -151,6 +158,17 @@ public class MainActivity extends AppCompatActivity {
         ClearEditText clearEditText = findViewById(R.id.edit_search);
         clearEditText.getmEdittext().setHint("查找附近的储物柜");
         //给导航按钮设置点击事件
+
+
+        //设置定位按钮
+        btn_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocationClient.stop();
+                requestLocation();
+            }
+        });
+
 
         //设置抽屉侧拉框
         btn_daohang.setOnClickListener(new View.OnClickListener() {
@@ -212,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
             requestLocation();
         }
 
-        init();
+//        init();
+//        initLocation();
     }
 
     private void setDrawlayout() {
@@ -252,18 +271,17 @@ public class MainActivity extends AppCompatActivity {
             }
             latitude = location.getLatitude();
             longitude = location.getLongitude();
-
-            Log.e(TAG,"latitude:"+latitude+"longitude:"+longitude);
+            Log.e(TAG,"after latitude:"+latitude+"longitude:"+longitude);
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
-            update = MapStatusUpdateFactory.zoomBy(16f);//将缩放级别设置为16
+            update = MapStatusUpdateFactory.zoomBy(16.5f);//将缩放级别设置为16
             baiduMap.animateMapStatus(update);
-            isFirstLocate = false;
+//            isFirstLocate = false;
         }
-        MyLocationData.Builder locatiobBuilder = new MyLocationData.Builder();
-        locatiobBuilder.latitude(location.getLatitude());
-        locatiobBuilder.longitude(location.getLongitude());
-        MyLocationData locationData = locatiobBuilder.build();
+        MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
+        locationBuilder.latitude(location.getLatitude());
+        locationBuilder.longitude(location.getLongitude());
+        MyLocationData locationData = locationBuilder.build();
         baiduMap.setMyLocationData(locationData);
     }
 
@@ -356,33 +374,36 @@ public class MainActivity extends AppCompatActivity {
     private void routeWalkPlanWithParam() {
     }
 
+    private void drawMarker(){
+
+    }
 
     private void init(){
         //定义Maker坐标点
         LatLng point;
 //        宿舍坐标latitude:23.148203 longitude:113.034409
+//        665，335
 //        double location[][] = new double[][]{{39.963175, 116.400244},{39.964175, 116.402244}};
-        double location[][] = new double[][]{{23.148203,113.034409},{23.148600, 113.034600}};
-        double location2[][] = new double[][]{{0.000915, 0.000015},{0.000135, 0.000135}};
-        for (int i = 0;i<2;i++){
-            if (latitude == 0 && longitude == 0){
-                point = new LatLng(location[i][0], location[i][1]);
-            }else {
-                point = new LatLng(latitude+location2[i][0], longitude+ location2[i][1]);
+//        double location[][] = new double[][]{{23.148203,113.034409},{23.148600, 113.034600}};
+//        double location2[][] = new double[][]{{0.000915, 0.000015},{0.000135, 0.000135}};
+        Log.e(TAG,"init()  latitude-->"+latitude+"longitude-->"+longitude);
+        requestPostNearbyStorage(latitude,longitude);
+        baiduMap.clear();
+        if (latitudes != null & longitudes != null) {
+            for (int i = 0; i < latitudes.length; i++) {
+                point = new LatLng(latitudes[i], longitudes[i]);
+                //构建Marker图标
+                BitmapDescriptor bitmap = BitmapDescriptorFactory
+                        .fromResource(R.drawable.home1);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions()
+                        .position(point)
+                        .icon(bitmap);
+                //在地图上添加Marker，并显示
+                baiduMap.addOverlay(option);
+                Log.e(TAG,"Marker latitude-->"+latitudes[i]+"longitude-->"+longitudes[i]);
             }
-
-            Log.e(TAG,"latitude-->"+latitude+"longitude-->"+longitude);
-            //构建Marker图标
-            BitmapDescriptor bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.home1);
-            //构建MarkerOption，用于在地图上添加Marker
-            OverlayOptions option = new MarkerOptions()
-                    .position(point)
-                    .icon(bitmap);
-            //在地图上添加Marker，并显示
-            baiduMap.addOverlay(option);
         }
-
 
         final RoutePlanSearch mSearch = RoutePlanSearch.newInstance();
 
@@ -394,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
                     overlay.removeFromMap();
                 }
                 overlay= new WalkingRouteOverlay(baiduMap);
+
                 if (walkingRouteResult.getRouteLines().size() > 0) {
                     //获取路径规划数据,(以返回的第一条数据为例)
                     //为WalkingRouteOverlay实例设置路径数据
@@ -401,8 +423,8 @@ public class MainActivity extends AppCompatActivity {
                     //在地图上绘制WalkingRouteOverlay
                     overlay.addToMap();
 
-                    Log.e(TAG,"overlay.getOverlayOptions()-->");
                 }
+
             }
 
             @Override
@@ -454,18 +476,40 @@ public class MainActivity extends AppCompatActivity {
         baiduMap.setOnMarkerClickListener(listener);
     }
     private void initLocation() {
-
-
+//
+//        Log.e(TAG,"initLocation()--->");
         LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);//设置为高精度模式
+//        option.setLocationMode(LocationClientOption.LocationMode.Device_Sensors);//设置为高精度模式，设置这个会导致onReceiveLocation无法回调
         //可选，设置发起定位请求的间隔，int类型，单位ms
         //如果设置为0，则代表单次定位，即仅定位一次，默认为0
         //如果设置非0，需设置1000ms以上才有效
-        option.setScanSpan(5000);
+        option.setScanSpan(0);
         option.setIsNeedAddress(true);
         option.setOpenGps(true);
         option.setCoorType("bd09ll");//设置返回经纬度坐标类型
         mLocationClient.setLocOption(option);
+
+//
+////可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+//        locationOption.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+////可选，默认gcj02，设置返回的定位结果坐标系，如果配合百度地图使用，建议设置为bd09ll;
+//        locationOption.setCoorType("gcj02");
+////可选，默认0，即仅定位一次，设置发起连续定位请求的间隔需要大于等于1000ms才是有效的
+//        locationOption.setScanSpan(5000);
+////可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
+//        locationOption.setLocationNotify(true);
+////可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
+//        locationOption.setIgnoreKillProcess(true);
+////可选，默认false，设置是否开启Gps定位
+//        locationOption.setOpenGps(true);
+////设置打开自动回调位置模式，该开关打开后，期间只要定位SDK检测到位置变化就会主动回调给开发者，该模式下开发者无需再关心定位间隔是多少，定位SDK本身发现位置变化就会及时回调给开发者
+////        locationOption.setOpenAutoNotifyMode();
+////设置打开自动回调位置模式，该开关打开后，期间只要定位SDK检测到位置变化就会主动回调给开发者
+//        locationOption.setOpenAutoNotifyMode(3000,1, LocationClientOption.LOC_SENSITIVITY_HIGHT);
+////需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+//        mLocationClient.setLocOption(locationOption);
+////开始定位
+//        mLocationClient.start();
     }
 
 
@@ -544,70 +588,31 @@ public class MainActivity extends AppCompatActivity {
             new Thread(postRun).start();
 
 //            Toast.makeText(MainActivity.this,""+scanResult,Toast.LENGTH_SHORT).show();
-            Log.e(TAG,scanResult);
+            Log.e(TAG,"二维码"+scanResult);
         }
 
 
     }
 
     public class MyLocationListener extends BDAbstractLocationListener {
-        //        public void onReceiveLocation(BDLocation location) {
-//            //此处的BDLocation为定位结果信息类，通过它的各种get方法可获取定位相关的全部结果
-//            //以下只列举部分获取经纬度相关（常用）的结果信息
-//            //更多结果信息获取说明，请参照类参考中BDLocation类中的说明
-//
-//            double latitude = location.getLatitude();    //获取纬度信息
-//            double longitude = location.getLongitude();    //获取经度信息
-//            float radius = location.getRadius();    //获取定位精度，默认值为0.0f
-//
-//            String coorType = location.getCoorType();
-//            //获取经纬度坐标类型，以LocationClientOption中设置过的坐标类型为准
-//
-//            int errorCode = location.getLocType();
-//            Log.d("MainActivity latitude:",latitude+"");
-//            Log.d("MainActivity longitude:",longitude+"");
-//            Log.d("MainActivity radius:",radius+"");
-//            Log.d("MainActivity coorType:",coorType);
-//            Log.d("MainActivity errorCode",errorCode+"  "+BDLocation.TypeGpsLocation);
-//
-//            //获取定位类型、定位错误返回码，具体信息可参照类参考中BDLocation类中的说明
-//        }
-
-
         public void onReceiveLocation(final BDLocation location) {
-
-//            //mapView 销毁后不在处理新接收的位置
-//            if (location == null || mapView == null){
-//                return;
-//            }
-//            MyLocationData locData = new MyLocationData.Builder()
-//                    .accuracy(location.getRadius())
-//                    // 此处设置开发者获取到的方向信息，顺时针0-360
-//                    .direction(location.getDirection()).latitude(location.getLatitude())
-//                    .longitude(location.getLongitude()).build();
-//            baiduMap.setMyLocationData(locData);
-
             if (location.getLocType() == BDLocation.TypeGpsLocation || location.getLocType() == BDLocation.TypeNetWorkLocation){
                 navigateTo(location);
-//                init();
+//                initLocation();
+//                double latitude = location.getLatitude();
+//                //获取经度信息
+//                double longitude = location.getLongitude();
+//                //获取定位精度，默认值为0.0f
+//                float radius = location.getRadius();
+//                //获取经纬度坐标类型，以LocationClientOption中设置过的坐标类型为准
+//                String coorType = location.getCoorType();
+//                //获取定位类型、定位错误返回码，具体信息可参照类参考中BDLocation类中的说明
+//                int errorCode = location.getLocType();
+//                Log.e(TAG,"errorCode:"+errorCode+"latitude:"+latitude+"longitude:"+longitude);
+//                Toast.makeText(MainActivity.this,"errorCode:"+errorCode+"latitude:"+latitude+"longitude:"+longitude,Toast.LENGTH_SHORT).show();
+                init();
             }
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    StringBuilder currentPosition = new StringBuilder();
-//                    currentPosition.append("纬度：").append(location.getLatitude()).append("\n");
-//                    currentPosition.append("经度：").append(location.getLongitude()).append("\n");
-//                    currentPosition.append("定位方式：");
-//                    if (location.getLocType() == BDLocation.TypeGpsLocation) {
-//                        currentPosition.append("GPS");
-//                    } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
-//                        currentPosition.append("网络");
-//                    }
-//                    positionText.setText(currentPosition);
-//                }
-//            });
         }
-
         public void onConnectHotSpotMessage(String s, int i) {
         }
 
@@ -644,14 +649,43 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
 
+    private void requestPostNearbyStorage(Double latitude,Double longitude){
+        try {
+//            10.4.123.236
+            String baseUrl = new HttpRequest().baseUrlGetNearbyStorage;
+            //使用okhttp3与数据库进行连接
+            Log.e(TAG,"token-->"+sp.getString("token",null));
+            Log.e(TAG,"requestPostOpen  storage_order_code-->"+storage_order_code);
+            HttpUtil.sendOkHttpRequestNear(baseUrl,latitude,longitude,sp.getString("token",null),new okhttp3.Callback(){
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,"连接失败",Toast.LENGTH_SHORT).show();
+                            Log.e(TAG,"requestPostbox-->>错误");
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String responseResult = response.body().string();
+                    Log.e(TAG,"requestPostNearbyStorage  responseResult-->>"+responseResult);
+                    parseJsonNearlyStroge(responseResult);
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+
     //储物柜使用的，打开储物柜发送storage_order_code和type(0打开,1关闭)
     //msg=本人柜子/他人柜子/柜子空闲
     private void requestPost(String scanResult) {
         try {
-            String baseUrl2 = "http://192.168.43.6:8080/locker/getNowStorageStatus";//当前储物柜状态
-            String baseUrl = "http://10.4.123.236:8080/locker/getNowStorageStatus";
-            String baseUrl3 = "http://172.20.10.9:8080/locker/getNowStorageStatus";
-            baseUrl = new HttpRequest().baseUrlGetNowStorageStatus;
+            String baseUrl = new HttpRequest().baseUrlGetNowStorageStatus;
             //使用okhttp3与数据库进行连接
 //            scanResult = "201909043612361114";//储物柜编号先写死,201909043612361213
             Log.e(TAG,"token-->"+sp.getString("token",null));
@@ -669,39 +703,45 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String responseResult = response.body().string();
-                    Log.e(TAG,"responseResult-->>"+responseResult);
+                    Log.e(TAG,"requestPost  responseResult-->>"+responseResult);
 //                    responseResult = "{\"code\":0,\"msg\":\"本人柜子\",\"data\":{\"now_storage_code\":\"12345\",\"storage_code\":\"321122\",\"son_storage_code\":\"1222\",\"location\":\"佛山\",\"dimensions\":\"5x5\",\"type\":\"中\",\"description\":null,\"status\":1}}"
 
                     //此处获取储物柜编号和地址
                     String msg = parseJSONWITHJSONObject(responseResult);
 //                    CreateOrderActivity.actionStart(MainActivity.this,responseResult);
-                    switch (msg){
-                        case "柜子空闲":
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showDialog();
-                                }
-                            });
-                            break;
-                        case "本人柜子":
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showDialogUse();
-                                }
-                            });
-                            break;
-                        case "他人柜子":
-                            showToastInThread(MainActivity.this,"该柜子已被使用!");
-                            break;
-                        case "超时未支付":
-                            showToastInThread(MainActivity.this,"超时未支付，请去订单表结算超时费用!");
-                            break;
-                        default:
+                    if (msg != null){
+                        switch (msg){
+                            case "柜子空闲":
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDialog();
+                                    }
+                                });
+                                break;
+                            case "本人柜子":
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showDialogUse();
+                                    }
+                                });
+                                break;
+                            case "他人柜子":
+                                showToastInThread(MainActivity.this,"该柜子已被使用!");
+                                break;
+                            case "超时未支付":
+                                showToastInThread(MainActivity.this,"超时未支付，请去订单表结算超时费用!");
+                                break;
+                            case "获取储物柜失败":
+                                showToastInThread(MainActivity.this,"储物柜码不正确!");
+                                break;
+                            default:
 
-                            break;
+                                break;
+                        }
                     }
+
 
                 }
             });
@@ -719,7 +759,7 @@ public class MainActivity extends AppCompatActivity {
             String baseUrl = "http://10.4.123.236:8080/locker/addUseRecord";
             String baseUrl2 = "http://192.168.43.6:8080/locker/addUseRecord";
             String baseUrl3 = "http://172.20.10.9:8080/locker/addUseRecord";
-            baseUrl = new HttpRequest().baseUrlAddUseRecord;
+            baseUrl2 = new HttpRequest().baseUrlAddUseRecord;
 
 
             //使用okhttp3与数据库进行连接
@@ -739,7 +779,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     final String responseResult = response.body().string();
-                    Log.e(TAG,"responseResult-->>"+responseResult);
+                    Log.e(TAG,"requestPostOpen  responseResult-->>"+responseResult);
                 }
             });
         } catch (Exception e) {
@@ -840,15 +880,36 @@ public class MainActivity extends AppCompatActivity {
         dialog.getWindow().setLayout((ScreenUtils.getScreenWidth(this)/4*3),LinearLayout.LayoutParams.WRAP_CONTENT);
     }
 
-//    Runnable postRuncreate = new Runnable() {
-//
-//        @Override
-//        public void run() {
-//            // TODO Auto-generated method stub
-//            requestCreateOrder(MainActivity.this,sp.getString("token",null),"","");
-////            Log.e(TAG,"requestCreateOrder-->"+str);
-//        }
-//    };
+
+    //处理发送储物柜码后的返回结果
+    private String parseJsonNearlyStroge(String jsondata) {
+//        jsondata = "{\"code\":0,\"msg\":\"查找成功\",\"data\":[{\"user_code\":49,\"username\":\"5\",\"nickname\":\"1\",\"account\":\"666\",\"password\":\"123\",\"identify\":\"131\",\"identification\":0,\"strorage_number\":0,\"coupun_number\":0,\"register_time\":\"2019-07-27 11:04:37.0\",\"binding\":\"8\",\"email\":\"336\",\"profile_photo_url\":\"10\",\"balance\":0.0}]}";
+//        jsondata = "{\"code\":0,\"msg\":\"查找成功\",\"data\":[{\"now_storage_code\":\"12345\",\"storage_code\":\"321122\",\"son_storage_code\":\"1222\",\"location\":\"佛山\",\"status\":0}]}";
+        String msg = null;
+
+        try {
+            Gson gson = new Gson();
+            NearlyStorage nearlyStorage =gson.fromJson(jsondata,NearlyStorage.class);
+            msg = nearlyStorage.getMsg();
+//            status = storage.getData().getStatus();
+            Log.e(TAG,"nearlyStorage.getMsg()-->>"+msg);
+            if (nearlyStorage.getData()!=null){
+                latitudes= new double[nearlyStorage.getData().size()];
+                longitudes= new double[nearlyStorage.getData().size()];
+                Log.e(TAG,"parseJsonNearlyStroge nearlyStorage.getData().size-->>"+nearlyStorage.getData().size());
+                for (int i =0;i<nearlyStorage.getData().size();i++){
+                    latitudes[i] = nearlyStorage.getData().get(i).getLatitude();
+                    longitudes[i] = nearlyStorage.getData().get(i).getLongitude();
+                    Log.e(TAG,"parseJsonNearlyStroge   getLatitude()-->>"+nearlyStorage.getData().get(i).getLatitude());
+                }
+            }
+//            code = user.getUser_code();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return msg;
+    }
+
 
 
     //处理发送储物柜码后的返回结果
@@ -898,29 +959,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    //HttpRequest无用
-//    public void requestCreateOrder(final Context context,String token,String storage_oredr_code,String pre_end_time) {
-//        try {
-////            10.4.123.236
-//            String baseUrl = "http://10.4.123.236:8080/locker/createStoreLockerOrder";
-//            String baseUrl2 = "http://192.168.43.10:8080/locker/createStoreLockerOrder";
-//            //使用okhttp3与数据库进行连接
-//            HttpUtil.sendOkHttpRequestOrderCreate(baseUrl,storage_oredr_code,pre_end_time,token,new okhttp3.Callback(){
-//                @Override
-//                public void onFailure(Call call, IOException e) {
-//                    Toast.makeText(context,"连接失败",Toast.LENGTH_SHORT).show();
-//                }
-//
-//                @Override
-//                public void onResponse(Call call, Response response) throws IOException {
-//                    String responseResult = response.body().string();
-//                    Log.e(TAG,"responseResult-->"+responseResult);
-////                    CreateOrderActivity.actionStart(context,responseResult);
-////                  responseResult = "{"code":0,"msg":"生成储物柜订单","data":{"storage_order_code":"024461509320","now_storage_code":"12345","start_time":null,"end_time":null,"pre_end_time":"2019-08-31 17:09:34.0","create_time":"2019-08-31 15:09:34.0","order_status":0,"has_overtime":null,"account":"17765602446","has_pay_fare":3.0}}"
-//                }
-//            });
-//
-//        } catch (Exception e) {
-//        }
-//    }
 }

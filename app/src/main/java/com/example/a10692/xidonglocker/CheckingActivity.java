@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +19,9 @@ import com.google.gson.Gson;
 import com.jaeger.library.StatusBarUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import model.User;
 import okhttp3.Call;
@@ -25,6 +30,8 @@ import view.HttpRequest;
 import view.HttpUtil;
 
 public class CheckingActivity extends AppCompatActivity {
+    private EditText first, second, third, fourth;
+    private List<EditText> mEdits = new ArrayList<EditText>();
     private Button btn_login;
     private TextView textView;
     private String code,tel;
@@ -42,21 +49,27 @@ public class CheckingActivity extends AppCompatActivity {
         StatusBarUtil.setTransparent(CheckingActivity.this);//设置沉浸式状态栏
         StatusBarUtil.setLightMode(CheckingActivity.this);//设置状态栏字体颜色
         Intent in = getIntent();
-        tel = in.getStringExtra("tel");
+        tel = in.getStringExtra("tel");//取出上个页面传过来的手机号码
         stringHashMap = new HashMap<>();
         textView = findViewById(R.id.phone_get);
         textView.setText(tel);
         btn_login = findViewById(R.id.btn_login);
+        init();
+
+        //点击登陆按钮事件监听
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                Intent in = new Intent(CheckingActivity.this,MainActivity.class);
 //                startActivity(in);
-                init();
+                initView();//在initview获取输入的验证码和手机号
                 new Thread(postRun).start();
             }
         });
     }
+
+
+
     Runnable postRun = new Runnable() {
 
         @Override
@@ -70,10 +83,7 @@ public class CheckingActivity extends AppCompatActivity {
 
     private void requestPost(final String tel, String code) {
         try {
-            String baseUrl = "http://192.168.43.6:8080/locker/loginByCode/";
-            String baseUrl2 = "http://10.4.123.236:8080/locker/loginByCode/";
-            String baseUrl3 = "http://172.20.10.9:8080/locker/loginByCode/";
-            baseUrl = new HttpRequest().baseUrlLoginByCode;
+            String baseUrl = new HttpRequest().baseUrlLoginByCode;
             //使用okhttp3与数据库进行连接
             HttpUtil.sendOkHttpRequestChecking(baseUrl,tel,code,new okhttp3.Callback(){
                 @Override
@@ -91,7 +101,7 @@ public class CheckingActivity extends AppCompatActivity {
                     String responseResult = response.body().string();
                     Log.e(TAG,"responseResult-->>"+responseResult);
 
-
+                    //用gson解析返回的数据，登陆成功即跳转到主界面
                     Log.e(TAG,"Gson-->>"+parseJSONWITHJSONObject(responseResult));
                     if (parseJSONWITHJSONObject(responseResult) == 0){
                         /*
@@ -178,9 +188,123 @@ public class CheckingActivity extends AppCompatActivity {
         editText2 = findViewById(R.id.edit_two);
         editText3 = findViewById(R.id.edit_three);
         editText4 = findViewById(R.id.edit_four);
+        Log.e(TAG,"onTextChanged");
+
+        //输入框中输入数字时，让光标跳转到下一个输入框，直到最后一个
+
+
+        editText1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s.toString().trim())){
+                    editText1.clearFocus();
+                    editText1.setFocusable(false);
+                    editText2.setFocusable(true);
+                    editText2.setFocusableInTouchMode(true);
+                    editText2.requestFocus();
+                }else{
+                    editText1.clearFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        editText2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Log.e(TAG,"beforeTextChanged");
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.e(TAG,"onTextChanged");
+                if (!TextUtils.isEmpty(s.toString().trim())){
+                    editText2.clearFocus();
+                    editText2.setFocusable(false);
+                    editText3.setFocusable(true);
+                    editText3.setFocusableInTouchMode(true);
+                    editText3.requestFocus();
+                }else{
+                    editText2.clearFocus();
+                    editText1.setFocusable(true);
+                    editText1.setFocusableInTouchMode(true);
+                    editText1.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.e(TAG,"afterTextChanged");
+            }
+        });
+        editText3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Log.e(TAG,"beforeTextChanged");
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.e(TAG,"onTextChanged");
+                if (!TextUtils.isEmpty(s.toString().trim())){
+                    editText3.clearFocus();
+                    editText3.setFocusable(false);
+                    editText4.setFocusable(true);
+                    editText4.setFocusableInTouchMode(true);
+                    editText4.requestFocus();
+                }else{
+                    editText3.clearFocus();
+                    editText2.setFocusable(true);
+                    editText2.setFocusableInTouchMode(true);
+                    editText2.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.e(TAG,"afterTextChanged");
+            }
+        });
+//        editText4.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (!TextUtils.isEmpty(s.toString().trim())){
+//                    editText4.clearFocus();
+//                    editText4.setFocusable(false);
+//                }else{
+//                    editText4.clearFocus();
+//                    editText3.setFocusable(true);
+//                    editText3.setFocusableInTouchMode(true);
+//                    editText3.requestFocus();
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
+
+
+        //结束
+
+
+    }
+    private void initView() {
         code = editText1.getText().toString()+""+editText2.getText().toString()+""+editText3.getText().toString()+""+editText4.getText().toString();
         Log.d(" CheckingActivity",code);
         stringHashMap.put("tel", tel);
         stringHashMap.put("code", code);
     }
+
 }
